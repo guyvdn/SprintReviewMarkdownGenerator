@@ -2,7 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using SprintReviewMarkdownGenerator.Markdown;
+using SprintReviewMarkdownGenerator.Markdown.Abstractions;
+using SprintReviewMarkdownGenerator.Markdown.Writers;
 using SprintReviewMarkdownGenerator.WorkItems;
 
 namespace SprintReviewMarkdownGenerator
@@ -10,11 +11,11 @@ namespace SprintReviewMarkdownGenerator
     public class GeneratorService
     {
         private readonly WorkItemService _workItemService;
-        private readonly MarkdownGenerator _markdownGenerator;
+        private readonly IMarkdownGenerator _markdownGenerator;
         private readonly MarkdownWriter _markdownWriter;
         private readonly AppSettings _appSettings;
 
-        public GeneratorService(WorkItemService workItemService, MarkdownGenerator markdownGenerator, MarkdownWriter markdownWriter, IOptions<AppSettings> appSettings)
+        public GeneratorService(WorkItemService workItemService, IMarkdownGenerator markdownGenerator, MarkdownWriter markdownWriter, IOptions<AppSettings> appSettings)
         {
             _workItemService = workItemService;
             _markdownGenerator = markdownGenerator;
@@ -27,7 +28,7 @@ namespace SprintReviewMarkdownGenerator
             var workItems = (await _workItemService.GetGroupedWorkItems()).ToList();
 
             var markDown = _markdownGenerator
-                .WithMarpHeader()
+                .Initialize("black")
                 .WithTitle("Sprint Review", DateTime.Today)
                 .WithAgenda(workItems, "Team Availability", "What's next")
                 .WithWorkItemsByStatus(workItems)

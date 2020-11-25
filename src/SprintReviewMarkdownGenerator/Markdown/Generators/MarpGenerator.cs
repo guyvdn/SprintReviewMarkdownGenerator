@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SprintReviewMarkdownGenerator.Markdown.Abstractions;
+using SprintReviewMarkdownGenerator.Markdown.Extensions;
 using SprintReviewMarkdownGenerator.WorkItems;
 
-namespace SprintReviewMarkdownGenerator.Markdown
+namespace SprintReviewMarkdownGenerator.Markdown.Generators
 {
-    public class MarkdownGenerator
+    public class MarpGenerator : IMarkdownGenerator
     {
         private readonly StringBuilder _stringBuilder = new StringBuilder();
 
@@ -19,20 +21,19 @@ namespace SprintReviewMarkdownGenerator.Markdown
         /// Add https://marp.app/ header
         /// </summary>
         /// <param name="theme"></param>
-        /// <param name="class"></param>
-        public MarkdownGenerator WithMarpHeader(string theme = "default", string @class = "invert")
+        public IMarkdownGenerator Initialize(string theme)
         {
             _stringBuilder.AppendLine("---");
             _stringBuilder.AppendLine("marp: true");
             _stringBuilder.AppendLine($"theme: {theme}");
-            _stringBuilder.AppendLine($"class: {@class}");
+            _stringBuilder.AppendLine("class: invert");
             _stringBuilder.AppendLine("---");
             _stringBuilder.AppendLine();
 
             return this;
         }
-
-        public MarkdownGenerator WithTitle(string title, DateTime date)
+        
+        public IMarkdownGenerator WithTitle(string title, DateTime date)
         {
             _stringBuilder.AppendLine("<style scoped>");
             _stringBuilder.AppendLine("{");
@@ -47,7 +48,8 @@ namespace SprintReviewMarkdownGenerator.Markdown
             return this;
         }
 
-        public MarkdownGenerator WithAgenda(IEnumerable<IGrouping<string, WorkItemDetail>> groupedItems, params string[] additionalPages)
+        public IMarkdownGenerator WithAgenda(IEnumerable<IGrouping<string, WorkItemDetail>> groupedItems,
+            params string[] additionalPages)
         {
             _stringBuilder.AppendTitle("Agenda");
             _stringBuilder.AppendBullet("Progress");
@@ -67,19 +69,8 @@ namespace SprintReviewMarkdownGenerator.Markdown
             return this;
         }
 
-        public MarkdownGenerator WithWorkItems(IEnumerable<IGrouping<string, WorkItemDetail>> groupedItems)
-        {
-            foreach (var group in groupedItems)
-            {
-                _stringBuilder.AppendTitle(group.Key);
-                AppendWorkItems(group);
-                _stringBuilder.AppendBreak();
-            }
-
-            return this;
-        }
-
-        public MarkdownGenerator WithWorkItemsByStatus(IEnumerable<IGrouping<string, WorkItemDetail>> groupedItems, string activeState = "Active", string completedState = "Resolved")
+        public IMarkdownGenerator WithWorkItemsByStatus(IEnumerable<IGrouping<string, WorkItemDetail>> groupedItems,
+            string activeState = "Active", string completedState = "Resolved")
         {
             foreach (var group in groupedItems)
             {
@@ -115,7 +106,7 @@ namespace SprintReviewMarkdownGenerator.Markdown
             }
         }
 
-        public MarkdownGenerator WithLinkPage(string pageTitle, string linkTitle, string uri)
+        public IMarkdownGenerator WithLinkPage(string pageTitle, string linkTitle, string uri)
         {
             _stringBuilder.AppendTitle(pageTitle);
             _stringBuilder.AppendLink(linkTitle, uri);

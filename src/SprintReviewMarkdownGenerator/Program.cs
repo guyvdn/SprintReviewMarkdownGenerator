@@ -6,7 +6,9 @@ using SprintReviewMarkdownGenerator.WorkItems.Grouping.Abstractions;
 using System.IO;
 using System.Threading.Tasks;
 using FluentOptionsValidator;
-using SprintReviewMarkdownGenerator.Markdown;
+using SprintReviewMarkdownGenerator.Markdown.Abstractions;
+using SprintReviewMarkdownGenerator.Markdown.Generators;
+using SprintReviewMarkdownGenerator.Markdown.Writers;
 
 namespace SprintReviewMarkdownGenerator
 {
@@ -25,7 +27,7 @@ namespace SprintReviewMarkdownGenerator
                 .AddSingleton<WorkItemRepository>()
                 .AddSingleton<WorkItemService>()
                 .AddSingleton<WorkItemMapper>()
-                .AddSingleton<MarkdownGenerator>()
+                .AddSingleton<IMarkdownGenerator, RevealMdGenerator>()
                 .AddSingleton<MarkdownWriter>()
                 .AddSingleton<IGroupWorkItems, GroupWorkItemsByBoardLane>()
                 .AddSingleton<GeneratorService>()
